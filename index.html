@@ -1,0 +1,858 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
+  /* Scoped styles to protect the hosting page environment */
+  .friendship-calc-container {
+    --bg-main: #0c0f17;
+    --bg-card: #151b2a;
+    --bg-input: #1b2237;
+    --color-accent: #d3bc8e;
+    --color-accent-rgb: 211, 188, 142;
+    --color-friendship: #7b8fc7;
+    --color-friendship-rgb: 123, 143, 199;
+    --color-text-primary: #ece5d8;
+    --color-text-secondary: #9ea8b9;
+    --color-border-primary: rgba(211, 188, 142, 0.2);
+    --color-border-secondary: rgba(123, 143, 199, 0.15);
+    --color-border-tertiary: rgba(255, 255, 255, 0.05);
+    --border-radius-lg: 12px;
+    --border-radius-md: 8px;
+    --border-radius-sm: 4px;
+
+    font-family: 'Lato', sans-serif;
+    color: var(--color-text-primary);
+    background-color: var(--bg-main);
+    padding: 2rem 1.5rem;
+    max-width: 960px;
+    margin: 1.5rem auto;
+    border-radius: 16px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(211, 188, 142, 0.12);
+  }
+
+  .friendship-calc-container * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Header Styling */
+  .friendship-calc-container .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .friendship-calc-container .header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+    text-shadow: 0 0 12px rgba(211, 188, 142, 0.3);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .friendship-calc-container .header p {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .friendship-calc-container .stellar-decor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .friendship-calc-container .stellar-decor .line {
+    height: 1px;
+    width: 80px;
+    background: linear-gradient(90deg, transparent, var(--color-border-primary), transparent);
+  }
+
+  .friendship-calc-container .stellar-decor .star {
+    color: var(--color-accent);
+    font-size: 12px;
+    text-shadow: 0 0 8px rgba(211, 188, 142, 0.6);
+  }
+
+  /* Structural Grid */
+  .friendship-calc-container .app-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .friendship-calc-container .app-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      align-items: start;
+    }
+    .friendship-calc-container .result-panel {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+
+  /* Card Layouts */
+  .friendship-calc-container .card {
+    background: var(--bg-card);
+    border: 1px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: border-color 0.3s;
+  }
+
+  .friendship-calc-container .card:hover {
+    border-color: rgba(211, 188, 142, 0.15);
+  }
+
+  .friendship-calc-container .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .friendship-calc-container .section-title::before {
+    content: '✦';
+    font-size: 9px;
+  }
+
+  /* Level Selections */
+  .friendship-calc-container .level-select-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .friendship-calc-container .field label {
+    display: block;
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .friendship-calc-container .field select, 
+  .friendship-calc-container .field input {
+    width: 100%;
+    height: 40px;
+    font-size: 14px;
+    font-family: 'Lato', sans-serif;
+    background: var(--bg-input);
+    border: 1px solid var(--color-border-tertiary);
+    color: var(--color-text-primary);
+    border-radius: var(--border-radius-md);
+    padding: 0 12px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .friendship-calc-container .field select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d3bc8e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+    padding-right: 36px;
+    cursor: pointer;
+  }
+
+  .friendship-calc-container .field select:focus, 
+  .friendship-calc-container .field input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(211, 188, 142, 0.15);
+  }
+
+  /* Pixel Method Visual Helper */
+  .friendship-calc-container .bar-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .friendship-calc-container .pixel-note {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    font-style: italic;
+    margin-bottom: 12px;
+  }
+
+  .friendship-calc-container .pixel-diagram-wrapper {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: var(--border-radius-md);
+    padding: 8px 12px;
+    border: 1px dashed var(--color-border-primary);
+    margin-bottom: 1rem;
+  }
+
+  .friendship-calc-container .pixel-diagram {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Progress Bar styling */
+  .friendship-calc-container .progress-visual {
+    background: rgba(0,0,0,0.2);
+    border-radius: var(--border-radius-md);
+    padding: 12px;
+    border: 1px solid var(--color-border-tertiary);
+    margin-top: 1rem;
+  }
+
+  .friendship-calc-container .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--color-friendship);
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .friendship-calc-container .progress-track {
+    height: 10px;
+    background: var(--bg-input);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid var(--color-border-tertiary);
+  }
+
+  .friendship-calc-container .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #516395 0%, var(--color-friendship) 100%);
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(123, 143, 199, 0.4);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Activities */
+  .friendship-calc-container .activities-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .friendship-calc-container .activity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: rgba(25, 33, 51, 0.5);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border-tertiary);
+    transition: all 0.2s ease;
+  }
+
+  .friendship-calc-container .activity-item.active {
+    background: var(--bg-card);
+    border-color: var(--color-border-secondary);
+  }
+
+  .friendship-calc-container .activity-item.inactive {
+    opacity: 0.5;
+  }
+
+  .friendship-calc-container .activity-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .friendship-calc-container .checkbox {
+    width: 20px;
+    height: 20px;
+    border: 1.5px solid var(--color-text-secondary);
+    border-radius: 4px;
+    background: var(--bg-input);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .friendship-calc-container .checkbox.checked {
+    background: var(--color-friendship);
+    border-color: var(--color-friendship);
+    box-shadow: 0 0 8px rgba(123, 143, 199, 0.4);
+  }
+
+  .friendship-calc-container .checkbox.checked::after {
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-0.5px, -1px);
+    display: block;
+  }
+
+  .friendship-calc-container .activity-details {
+    cursor: pointer;
+  }
+
+  .friendship-calc-container .activity-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+  }
+
+  .friendship-calc-container .activity-exp {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+  }
+
+  /* Solo/Coop Toggles */
+  .friendship-calc-container .toggle-group {
+    display: flex;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 3px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border-tertiary);
+    margin-left: 12px;
+  }
+
+  .friendship-calc-container .toggle-btn {
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Lato', sans-serif;
+    border: none;
+    border-radius: 15px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .friendship-calc-container .toggle-btn.active {
+    background: var(--color-friendship);
+    color: white;
+    box-shadow: 0 2px 8px rgba(123, 143, 199, 0.3);
+  }
+
+  /* Resin stepper element styling */
+  .friendship-calc-container .resin-count-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .friendship-calc-container .resin-count-row label {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .friendship-calc-container .number-stepper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-input);
+    border: 1px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+  }
+
+  .friendship-calc-container .step-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-accent);
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .friendship-calc-container .step-btn:hover {
+    background: rgba(211, 188, 142, 0.1);
+  }
+
+  .friendship-calc-container .number-stepper input {
+    width: 32px !important;
+    height: 26px !important;
+    border: none !important;
+    background: transparent !important;
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-text-primary);
+    padding: 0 !important;
+  }
+
+  /* Output / Results Panel styles */
+  .friendship-calc-container .result-card {
+    background: linear-gradient(135deg, #151b2a 0%, #1a2238 100%);
+    border: 1px solid var(--color-border-primary);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(211, 188, 142, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .friendship-calc-container .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  }
+
+  .friendship-calc-container .result-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .friendship-calc-container .result-stat {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--border-radius-md);
+    padding: 12px 6px;
+    text-align: center;
+    transition: transform 0.2s ease, border-color 0.2s;
+  }
+
+  .friendship-calc-container .result-stat:hover {
+    transform: translateY(-2px);
+    border-color: rgba(211, 188, 142, 0.25);
+  }
+
+  .friendship-calc-container .result-stat .value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--color-accent);
+    font-family: 'Cinzel', serif;
+    line-height: 1.2;
+    text-shadow: 0 0 8px rgba(211, 188, 142, 0.3);
+  }
+
+  .friendship-calc-container .result-stat .unit {
+    font-size: 9px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  .friendship-calc-container .breakdown-list {
+    border-top: 1px solid var(--color-border-tertiary);
+    padding-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .friendship-calc-container .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .friendship-calc-container .breakdown-row .b-label { 
+    color: var(--color-text-secondary); 
+  }
+
+  .friendship-calc-container .breakdown-row .b-val { 
+    color: var(--color-text-primary); 
+    font-weight: 700; 
+  }
+
+  .friendship-calc-container .no-result,
+  .friendship-calc-container .max-level {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    color: var(--color-accent);
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+  }
+
+  .friendship-calc-container .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+</style>
+
+<div class="friendship-calc-container">
+  <h2 class="sr-only">Genshin Impact Friendship Calculator</h2>
+
+  <div class="header">
+    <h1>✦ Friendship Calculator ✦</h1>
+    <p>Genshin Impact · Companion EXP Tracker</p>
+    <div class="stellar-decor">
+      <span class="line"></span>
+      <span class="star">✦</span>
+      <span class="line"></span>
+    </div>
+  </div>
+
+  <div class="app-grid">
+    <!-- Configuration Panel (Left) -->
+    <div class="config-panel">
+      <!-- Card 1: Character & Current Level -->
+      <div class="card">
+        <div class="section-title">Character & Current Level</div>
+
+        <div class="level-select-row">
+          <div class="field">
+            <label>Current Level</label>
+            <select id="curLevel">
+              <option value="1">Level 1</option>
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+              <option value="6">Level 6</option>
+              <option value="7">Level 7</option>
+              <option value="8">Level 8</option>
+              <option value="9">Level 9</option>
+              <option value="10">Level 10 ✦</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Target Level</label>
+            <select id="targetLevel">
+              <option value="2">Level 2</option>
+              <option value="3">Level 3</option>
+              <option value="4">Level 4</option>
+              <option value="5">Level 5</option>
+              <option value="6">Level 6</option>
+              <option value="7">Level 7</option>
+              <option value="8">Level 8</option>
+              <option value="9">Level 9</option>
+              <option value="10" selected>Level 10 ✦</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:8px">Progress Within Current Level (Pixel Method)</div>
+        <p class="pixel-note">Screenshot your in-game bar, then measure the total width and your filled width in pixels.</p>
+        
+        <div class="pixel-diagram-wrapper">
+          <svg class="pixel-diagram" viewBox="0 0 400 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="22" width="380" height="12" rx="6" fill="#1b2237" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <rect x="10" y="22" width="160" height="12" rx="6" fill="#7b8fc7" />
+            <path d="M 10 40 L 10 46 L 170 46 L 170 40" stroke="#7b8fc7" stroke-width="1" stroke-dasharray="2 2"/>
+            <text x="90" y="56" fill="#8ea1db" font-size="9" text-anchor="middle" font-family="'Lato', sans-serif" font-weight="bold" letter-spacing="0.05em">CURRENT FILL (PX)</text>
+            <path d="M 10 16 L 10 10 L 390 10 L 390 16" stroke="#d3bc8e" stroke-width="1" stroke-dasharray="2 2"/>
+            <text x="200" y="5" fill="#d3bc8e" font-size="9" text-anchor="middle" font-family="'Lato', sans-serif" font-weight="bold" letter-spacing="0.05em">FULL BAR WIDTH (PX)</text>
+          </svg>
+        </div>
+
+        <div class="bar-inputs">
+          <div class="field">
+            <label>Full bar width (px)</label>
+            <input type="number" id="fullBar" value="300" min="1" placeholder="e.g. 300">
+          </div>
+          <div class="field">
+            <label>Current fill (px)</label>
+            <input type="number" id="curFill" value="0" min="0" placeholder="e.g. 75">
+          </div>
+        </div>
+
+        <div class="progress-visual" id="progressVis" style="display:none">
+          <div class="progress-label">
+            <span id="progressPct">0%</span>
+            <span id="progressExp">0 / 0 EXP</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Daily Activities -->
+      <div class="card">
+        <div class="section-title">Daily Activities</div>
+        <div class="activities-grid" id="activitiesGrid"></div>
+      </div>
+    </div>
+
+    <!-- Sticky Results Panel (Right) -->
+    <div class="result-panel">
+      <div id="resultArea"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const EXP_TABLE = { 1:1000, 2:1550, 3:2050, 4:2600, 5:3175, 6:3750, 7:4350, 8:4975, 9:5650 };
+
+const ACTIVITIES = [
+  { id:'commission', name:'Commissions', baseExp:60, coopExp:120, desc:'×4/day', hasCoop:true, resinBased:false, defaultOn:true },
+  { id:'dailyReward', name:'Daily reward', baseExp:100, coopExp:200, desc:'Complete all 4', hasCoop:true, resinBased:false, defaultOn:true },
+  { id:'dogEvent', name:'Dog feeding event', baseExp:150, coopExp:300, desc:'Event total', hasCoop:true, resinBased:false, defaultOn:false },
+  { id:'resin', name:'Resin', baseExp:180, coopExp:240, desc:'/day (set uses)', hasCoop:true, resinBased:true, defaultOn:true },
+  { id:'pot', name:'Serenitea Pot', baseExp:120, coopExp:120, desc:'Flat 24h reward', hasCoop:false, resinBased:false, defaultOn:true },
+];
+
+const state = {
+  curLevel: 1,
+  targetLevel: 10,
+  fullBar: 300,
+  curFill: 0,
+  resinUses: 1,
+  activities: {},
+  coopMode: {},
+};
+
+ACTIVITIES.forEach(a => {
+  state.activities[a.id] = a.defaultOn;
+  state.coopMode[a.id] = false;
+});
+
+function buildActivities() {
+  const grid = document.getElementById('activitiesGrid');
+  grid.innerHTML = '';
+  
+  ACTIVITIES.forEach(a => {
+    const on = state.activities[a.id];
+    const coop = state.coopMode[a.id];
+    const exp = coop ? a.coopExp : a.baseExp;
+
+    const item = document.createElement('div');
+    item.className = `activity-item ${on ? 'active' : 'inactive'}`;
+
+    const resinRow = a.resinBased ? `
+      <div class="resin-count-row">
+        <label>Uses/day:</label>
+        <div class="number-stepper">
+          <button type="button" class="step-btn minus">-</button>
+          <input type="number" id="resin-uses" min="1" max="20" value="${state.resinUses}" readonly>
+          <button type="button" class="step-btn plus">+</button>
+        </div>
+      </div>` : '';
+
+    item.innerHTML = `
+      <div class="activity-info">
+        <div class="checkbox ${on ? 'checked' : ''}" data-chk-id="${a.id}"></div>
+        <div class="activity-details" data-toggle="${a.id}">
+          <div class="activity-name">${a.name}</div>
+          <div class="activity-exp">${exp} EXP · ${a.desc}</div>
+          ${resinRow}
+        </div>
+      </div>
+      ${a.hasCoop ? `
+      <div class="toggle-group">
+        <button class="toggle-btn ${!coop ? 'active' : ''}" data-act="${a.id}" data-mode="solo">Solo</button>
+        <button class="toggle-btn ${coop ? 'active' : ''}" data-act="${a.id}" data-mode="coop">Co-op</button>
+      </div>` : ''}
+    `;
+
+    grid.appendChild(item);
+
+    // Activity Active/Inactive Toggles
+    const triggerToggle = () => {
+      state.activities[a.id] = !state.activities[a.id];
+      buildActivities();
+      calculate();
+    };
+
+    item.querySelector(`[data-chk-id="${a.id}"]`).addEventListener('click', (e) => {
+      e.stopPropagation();
+      triggerToggle();
+    });
+
+    item.querySelector(`[data-toggle="${a.id}"]`).addEventListener('click', (e) => {
+      // Prevent nesting interactions (like clicking step buttons or internal elements) from triggering toggle
+      if(e.target.closest('.number-stepper') || e.target.closest('.step-btn')) return;
+      triggerToggle();
+    });
+
+    // Solo/Co-op button handlers
+    const coopBtns = item.querySelectorAll('[data-act]');
+    coopBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.coopMode[a.id] = btn.dataset.mode === 'coop';
+        buildActivities();
+        calculate();
+      });
+    });
+
+    // Resin counter stepper handlers
+    if (a.resinBased) {
+      const decBtn = item.querySelector('.step-btn.minus');
+      const incBtn = item.querySelector('.step-btn.plus');
+      
+      if (decBtn && incBtn) {
+        decBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.resinUses = Math.max(1, state.resinUses - 1);
+          buildActivities();
+          calculate();
+        });
+        incBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.resinUses = Math.min(20, state.resinUses + 1);
+          buildActivities();
+          calculate();
+        });
+      }
+    }
+  });
+}
+
+function getExpPerDay() {
+  let total = 0;
+  ACTIVITIES.forEach(a => {
+    if (!state.activities[a.id]) return;
+    const exp = state.coopMode[a.id] ? a.coopExp : a.baseExp;
+    if (a.id === 'commission') total += exp * 4;
+    else if (a.id === 'resin') total += exp * state.resinUses;
+    else total += exp;
+  });
+  return total;
+}
+
+function getTotalExpNeeded() {
+  let total = 0;
+  for (let lvl = state.curLevel; lvl < state.targetLevel; lvl++) {
+    if (EXP_TABLE[lvl]) total += EXP_TABLE[lvl];
+  }
+  return total;
+}
+
+function getAlreadyEarned() {
+  const fullBar = state.fullBar || 1;
+  const curFill = Math.min(state.curFill, fullBar);
+  const ratio = curFill / fullBar;
+  const lvlExp = EXP_TABLE[state.curLevel] || 0;
+  return Math.round(ratio * lvlExp);
+}
+
+function calculate() {
+  const result = document.getElementById('resultArea');
+  const vis = document.getElementById('progressVis');
+
+  if (state.curLevel >= state.targetLevel) {
+    result.innerHTML = `
+      <div class="result-card">
+        <div class="max-level">✦ Already reached target level!</div>
+      </div>`;
+    vis.style.display = 'none';
+    return;
+  }
+
+  const lvlExp = EXP_TABLE[state.curLevel] || 0;
+  const earned = getAlreadyEarned();
+  const pct = lvlExp > 0 ? Math.round((earned / lvlExp) * 100) : 0;
+
+  vis.style.display = 'block';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressExp').textContent = earned.toLocaleString() + ' / ' + lvlExp.toLocaleString() + ' EXP';
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  const totalNeeded = getTotalExpNeeded();
+  const remaining = Math.max(0, totalNeeded - earned);
+  const expPerDay = getExpPerDay();
+  const days = expPerDay > 0 ? Math.ceil(remaining / expPerDay) : Infinity;
+
+  const daysText = expPerDay === 0 ? '∞' : days.toLocaleString();
+  const weeksText = expPerDay === 0 ? '∞' : (days / 7).toFixed(1);
+  const expText = expPerDay.toLocaleString();
+
+  result.innerHTML = `
+    <div class="result-card">
+      <div class="section-title" style="margin-bottom:12px">Estimated Progress</div>
+      <div class="result-main">
+        <div class="result-stat">
+          <div class="value">${daysText}</div>
+          <div class="unit">Days</div>
+        </div>
+        <div class="result-stat">
+          <div class="value">${weeksText}</div>
+          <div class="unit">Weeks</div>
+        </div>
+        <div class="result-stat">
+          <div class="value">${expText}</div>
+          <div class="unit">EXP/day</div>
+        </div>
+      </div>
+      <div class="breakdown-list">
+        <div class="breakdown-row">
+          <span class="b-label">EXP remaining</span>
+          <span class="b-val">${remaining.toLocaleString()}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="b-label">Total EXP (Lv${state.curLevel}→${state.targetLevel})</span>
+          <span class="b-val">${totalNeeded.toLocaleString()}</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="b-label">Already earned (this lvl)</span>
+          <span class="b-val">${earned.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('curLevel').addEventListener('change', e => {
+  state.curLevel = parseInt(e.target.value);
+  const targetSel = document.getElementById('targetLevel');
+  Array.from(targetSel.options).forEach(opt => {
+    opt.disabled = parseInt(opt.value) <= state.curLevel;
+  });
+  if (state.targetLevel <= state.curLevel) {
+    state.targetLevel = state.curLevel + 1;
+    targetSel.value = state.targetLevel;
+  }
+  calculate();
+});
+
+document.getElementById('targetLevel').addEventListener('change', e => {
+  state.targetLevel = parseInt(e.target.value);
+  calculate();
+});
+
+['fullBar','curFill'].forEach(id => {
+  document.getElementById(id).addEventListener('input', e => {
+    state[id] = parseFloat(e.target.value) || 0;
+    calculate();
+  });
+});
+
+buildActivities();
+calculate();
+</script>
