@@ -10,6 +10,7 @@
     --color-accent-rgb: 211, 188, 142;
     --color-friendship: #7b8fc7;
     --color-friendship-rgb: 123, 143, 199;
+    --color-success: #6ea977;
     --color-text-primary: #ece5d8;
     --color-text-secondary: #9ea8b9;
     --color-border-primary: rgba(211, 188, 142, 0.2);
@@ -249,14 +250,14 @@
   .friendship-calc-container .activities-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 
   .friendship-calc-container .activity-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 14px;
+    padding: 10px 14px;
     background: rgba(25, 33, 51, 0.5);
     border-radius: var(--border-radius-md);
     border: 1px solid var(--color-border-tertiary);
@@ -311,6 +312,7 @@
 
   .friendship-calc-container .activity-details {
     cursor: pointer;
+    flex-grow: 1;
   }
 
   .friendship-calc-container .activity-name {
@@ -356,7 +358,7 @@
     box-shadow: 0 2px 8px rgba(123, 143, 199, 0.3);
   }
 
-  /* Resin stepper element styling */
+  /* Resin stepper */
   .friendship-calc-container .resin-count-row {
     display: flex;
     align-items: center;
@@ -409,7 +411,7 @@
     padding: 0 !important;
   }
 
-  /* Output / Results Panel styles */
+  /* Output / Results Panel */
   .friendship-calc-container .result-card {
     background: linear-gradient(135deg, #151b2a 0%, #1a2238 100%);
     border: 1px solid var(--color-border-primary);
@@ -430,9 +432,75 @@
     background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
   }
 
+  /* Today's Forecast Box (The Tactical View) */
+  .friendship-calc-container .today-forecast-box {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    background: rgba(123, 143, 199, 0.08);
+    border: 1px dashed var(--color-friendship);
+    border-radius: var(--border-radius-md);
+    position: relative;
+  }
+
+  .friendship-calc-container .forecast-label {
+    font-size: 10px;
+    color: var(--color-friendship);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .friendship-calc-container .forecast-value {
+    font-size: 24px;
+    color: var(--color-text-primary);
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .friendship-calc-container .forecast-value .f-pct {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .friendship-calc-container .forecast-sub {
+    font-size: 11px;
+    color: var(--color-success);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* Estimated Target Date Box (Long term) */
+  .friendship-calc-container .target-date-box {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(211, 188, 142, 0.05);
+    border: 1px solid rgba(211, 188, 142, 0.15);
+    border-radius: var(--border-radius-md);
+  }
+
+  .friendship-calc-container .target-date-box p {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  .friendship-calc-container .target-date-box h3 {
+    font-size: 18px;
+    color: var(--color-accent);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
+  }
+
   .friendship-calc-container .result-main {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-bottom: 1.5rem;
   }
@@ -443,21 +511,14 @@
     border-radius: var(--border-radius-md);
     padding: 12px 6px;
     text-align: center;
-    transition: transform 0.2s ease, border-color 0.2s;
-  }
-
-  .friendship-calc-container .result-stat:hover {
-    transform: translateY(-2px);
-    border-color: rgba(211, 188, 142, 0.25);
   }
 
   .friendship-calc-container .result-stat .value {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 600;
-    color: var(--color-accent);
+    color: var(--color-text-primary);
     font-family: 'Cinzel', serif;
     line-height: 1.2;
-    text-shadow: 0 0 8px rgba(211, 188, 142, 0.3);
   }
 
   .friendship-calc-container .result-stat .unit {
@@ -602,9 +663,10 @@
         </div>
       </div>
 
-      <!-- Card 2: Daily Activities -->
+      <!-- Card 2: Today's Tasks -->
       <div class="card">
-        <div class="section-title">Daily Activities</div>
+        <div class="section-title">Today's Activities Configuration</div>
+        <p class="pixel-note" style="margin-bottom:12px;">Toggle tasks to see exactly where you will end up tonight. Averages are used for long-term estimates.</p>
         <div class="activities-grid" id="activitiesGrid"></div>
       </div>
     </div>
@@ -619,12 +681,18 @@
 <script>
 const EXP_TABLE = { 1:1000, 2:1550, 3:2050, 4:2600, 5:3175, 6:3750, 7:4350, 8:4975, 9:5650 };
 
+// Values assumed for High/Max Adventure Rank
 const ACTIVITIES = [
-  { id:'commission', name:'Commissions', baseExp:60, coopExp:120, desc:'×4/day', hasCoop:true, resinBased:false, defaultOn:true },
-  { id:'dailyReward', name:'Daily reward', baseExp:100, coopExp:200, desc:'Complete all 4', hasCoop:true, resinBased:false, defaultOn:true },
-  { id:'dogEvent', name:'Dog feeding event', baseExp:150, coopExp:300, desc:'Event total', hasCoop:true, resinBased:false, defaultOn:false },
-  { id:'resin', name:'Resin', baseExp:180, coopExp:240, desc:'/day (set uses)', hasCoop:true, resinBased:true, defaultOn:true },
-  { id:'pot', name:'Serenitea Pot', baseExp:120, coopExp:120, desc:'Flat 24h reward', hasCoop:false, resinBased:false, defaultOn:true },
+  { id:'commission', name:'Commissions', baseExp:60, coopExp:120, desc:'×4/day', hasCoop:true, defaultOn:true },
+  { id:'dailyReward', name:'Daily reward', baseExp:100, coopExp:200, desc:'Katheryne bonus', hasCoop:true, defaultOn:true },
+  { id:'pot', name:'Serenitea Pot', baseExp:120, coopExp:120, desc:'Flat 24h reward', hasCoop:false, defaultOn:true },
+  { id:'randomEvent', name:'Random Events', baseExp:15, coopExp:30, desc:'e.g. Wardens (Max 10/day)', hasCoop:true, isCountable:true, defaultOn:false, defaultUses: 10 },
+  
+  { id:'domain', name:'Challenge Domains', baseExp:20, coopExp:40, desc:'Max difficulty (20 Resin)', hasCoop:true, isCountable:true, defaultOn:true, defaultUses: 8 },
+  { id:'leyline', name:'Ley Line Outcrop', baseExp:20, coopExp:40, desc:'Max AR (20 Resin)', hasCoop:true, isCountable:true, defaultOn:false, defaultUses: 0 },
+  { id:'normalBoss', name:'Normal Bosses', baseExp:45, coopExp:90, desc:'Max AR (40 Resin)', hasCoop:true, isCountable:true, defaultOn:false, defaultUses: 0 },
+  { id:'weeklyBoss', name:'Weekly Bosses', baseExp:70, coopExp:140, desc:'Massive EXP burst (30/60 Resin)', hasCoop:true, isCountable:true, isWeekly:true, defaultOn:false, defaultUses: 3 },
+  { id:'forgeOre', name:'Forge Mystic Ore', baseExp:10, coopExp:10, desc:'Magical Crystal (10 Resin)', hasCoop:false, isCountable:true, defaultOn:false, defaultUses: 0 },
 ];
 
 const state = {
@@ -632,14 +700,18 @@ const state = {
   targetLevel: 10,
   fullBar: 300,
   curFill: 0,
-  resinUses: 1,
   activities: {},
   coopMode: {},
+  uses: {} 
 };
 
+// Initialize State
 ACTIVITIES.forEach(a => {
   state.activities[a.id] = a.defaultOn;
   state.coopMode[a.id] = false;
+  if (a.isCountable) {
+    state.uses[a.id] = a.defaultUses || 0;
+  }
 });
 
 function buildActivities() {
@@ -654,12 +726,12 @@ function buildActivities() {
     const item = document.createElement('div');
     item.className = `activity-item ${on ? 'active' : 'inactive'}`;
 
-    const resinRow = a.resinBased ? `
+    const countRow = a.isCountable ? `
       <div class="resin-count-row">
-        <label>Uses/day:</label>
+        <label>${a.id === 'commission' ? '' : 'Count:'}</label>
         <div class="number-stepper">
           <button type="button" class="step-btn minus">-</button>
-          <input type="number" id="resin-uses" min="1" max="20" value="${state.resinUses}" readonly>
+          <input type="number" min="0" max="99" value="${state.uses[a.id]}" readonly>
           <button type="button" class="step-btn plus">+</button>
         </div>
       </div>` : '';
@@ -670,7 +742,7 @@ function buildActivities() {
         <div class="activity-details" data-toggle="${a.id}">
           <div class="activity-name">${a.name}</div>
           <div class="activity-exp">${exp} EXP · ${a.desc}</div>
-          ${resinRow}
+          ${countRow}
         </div>
       </div>
       ${a.hasCoop ? `
@@ -682,7 +754,7 @@ function buildActivities() {
 
     grid.appendChild(item);
 
-    // Activity Active/Inactive Toggles
+    // Interaction handlers
     const triggerToggle = () => {
       state.activities[a.id] = !state.activities[a.id];
       buildActivities();
@@ -690,68 +762,59 @@ function buildActivities() {
     };
 
     item.querySelector(`[data-chk-id="${a.id}"]`).addEventListener('click', (e) => {
-      e.stopPropagation();
-      triggerToggle();
+      e.stopPropagation(); triggerToggle();
     });
 
     item.querySelector(`[data-toggle="${a.id}"]`).addEventListener('click', (e) => {
-      // Prevent nesting interactions (like clicking step buttons or internal elements) from triggering toggle
       if(e.target.closest('.number-stepper') || e.target.closest('.step-btn')) return;
       triggerToggle();
     });
 
-    // Solo/Co-op button handlers
     const coopBtns = item.querySelectorAll('[data-act]');
     coopBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         state.coopMode[a.id] = btn.dataset.mode === 'coop';
-        buildActivities();
-        calculate();
+        buildActivities(); calculate();
       });
     });
 
-    // Resin counter stepper handlers
-    if (a.resinBased) {
-      const decBtn = item.querySelector('.step-btn.minus');
-      const incBtn = item.querySelector('.step-btn.plus');
-      
-      if (decBtn && incBtn) {
-        decBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          state.resinUses = Math.max(1, state.resinUses - 1);
-          buildActivities();
-          calculate();
-        });
-        incBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          state.resinUses = Math.min(20, state.resinUses + 1);
-          buildActivities();
-          calculate();
-        });
-      }
+    if (a.isCountable) {
+      item.querySelector('.step-btn.minus').addEventListener('click', (e) => {
+        e.stopPropagation(); state.uses[a.id] = Math.max(0, state.uses[a.id] - 1);
+        buildActivities(); calculate();
+      });
+      item.querySelector('.step-btn.plus').addEventListener('click', (e) => {
+        e.stopPropagation(); state.uses[a.id] = Math.min(99, state.uses[a.id] + 1);
+        buildActivities(); calculate();
+      });
     }
   });
 }
 
-function getExpPerDay() {
-  let total = 0;
+function getExpData() {
+  let todayTotal = 0;   // Tactical: exactly what is checked right now
+  let avgDaily = 0;     // Strategic: Weekly tasks are divided by 7 for long term estimates
+
   ACTIVITIES.forEach(a => {
     if (!state.activities[a.id]) return;
     const exp = state.coopMode[a.id] ? a.coopExp : a.baseExp;
-    if (a.id === 'commission') total += exp * 4;
-    else if (a.id === 'resin') total += exp * state.resinUses;
-    else total += exp;
+    
+    let occurrences = 1;
+    if (a.id === 'commission') occurrences = 4;
+    else if (a.isCountable) occurrences = state.uses[a.id];
+    
+    const activityExp = exp * occurrences;
+    todayTotal += activityExp;
+    
+    if (a.isWeekly) {
+      avgDaily += (activityExp / 7);
+    } else {
+      avgDaily += activityExp;
+    }
   });
-  return total;
-}
-
-function getTotalExpNeeded() {
-  let total = 0;
-  for (let lvl = state.curLevel; lvl < state.targetLevel; lvl++) {
-    if (EXP_TABLE[lvl]) total += EXP_TABLE[lvl];
-  }
-  return total;
+  
+  return { todayTotal, avgDaily };
 }
 
 function getAlreadyEarned() {
@@ -779,49 +842,81 @@ function calculate() {
   const earned = getAlreadyEarned();
   const pct = lvlExp > 0 ? Math.round((earned / lvlExp) * 100) : 0;
 
+  // Update Visual Progress Bar
   vis.style.display = 'block';
   document.getElementById('progressPct').textContent = pct + '%';
   document.getElementById('progressExp').textContent = earned.toLocaleString() + ' / ' + lvlExp.toLocaleString() + ' EXP';
   document.getElementById('progressFill').style.width = pct + '%';
 
-  const totalNeeded = getTotalExpNeeded();
-  const remaining = Math.max(0, totalNeeded - earned);
-  const expPerDay = getExpPerDay();
-  const days = expPerDay > 0 ? Math.ceil(remaining / expPerDay) : Infinity;
+  // Fetch math streams
+  const exps = getExpData();
+  const totalNeeded = 0;
+  let accumulated = 0;
+  for (let lvl = state.curLevel; lvl < state.targetLevel; lvl++) {
+    if (EXP_TABLE[lvl]) accumulated += EXP_TABLE[lvl];
+  }
+  const remaining = Math.max(0, accumulated - earned);
+  const days = exps.avgDaily > 0 ? Math.ceil(remaining / exps.avgDaily) : Infinity;
 
-  const daysText = expPerDay === 0 ? '∞' : days.toLocaleString();
-  const weeksText = expPerDay === 0 ? '∞' : (days / 7).toFixed(1);
-  const expText = expPerDay.toLocaleString();
+  // Simulate End of Day Progress
+  let simEarned = earned + exps.todayTotal;
+  let simLevel = state.curLevel;
+  let leveledUpText = '';
+
+  while (simLevel < 10 && simEarned >= EXP_TABLE[simLevel]) {
+    simEarned -= EXP_TABLE[simLevel];
+    simLevel++;
+    leveledUpText = ' ✦ Level Up!';
+  }
+
+  let simPct = 0;
+  if (simLevel < 10) {
+    simPct = Math.round((simEarned / EXP_TABLE[simLevel]) * 100);
+  } else {
+    simPct = 100;
+  }
+
+  // Formatting strings
+  let targetDateText = "Select activities";
+  if (days !== Infinity && exps.avgDaily > 0) {
+    const today = new Date();
+    today.setDate(today.getDate() + days);
+    targetDateText = today.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  const daysText = exps.avgDaily === 0 ? '∞' : days.toLocaleString();
 
   result.innerHTML = `
     <div class="result-card">
-      <div class="section-title" style="margin-bottom:12px">Estimated Progress</div>
+      
+      <!-- TACTICAL VIEW: What happens today -->
+      <div class="today-forecast-box">
+        <div class="forecast-label">Tonight's Projection</div>
+        <div class="forecast-value">Lv. ${simLevel} <span class="f-pct">(${simPct}%)</span></div>
+        <div class="forecast-sub">+${exps.todayTotal.toLocaleString()} EXP today${leveledUpText}</div>
+      </div>
+
+      <!-- STRATEGIC VIEW: Long term schedule -->
+      <div class="target-date-box">
+        <p>Estimated Completion Date</p>
+        <h3>${targetDateText}</h3>
+      </div>
+      
       <div class="result-main">
         <div class="result-stat">
           <div class="value">${daysText}</div>
-          <div class="unit">Days</div>
+          <div class="unit">Days to goal</div>
         </div>
         <div class="result-stat">
-          <div class="value">${weeksText}</div>
-          <div class="unit">Weeks</div>
-        </div>
-        <div class="result-stat">
-          <div class="value">${expText}</div>
-          <div class="unit">EXP/day</div>
+          <div class="value">${Math.round(exps.avgDaily).toLocaleString()}</div>
+          <div class="unit">Daily Avg</div>
         </div>
       </div>
+      
       <div class="breakdown-list">
         <div class="breakdown-row">
           <span class="b-label">EXP remaining</span>
           <span class="b-val">${remaining.toLocaleString()}</span>
-        </div>
-        <div class="breakdown-row">
-          <span class="b-label">Total EXP (Lv${state.curLevel}→${state.targetLevel})</span>
-          <span class="b-val">${totalNeeded.toLocaleString()}</span>
-        </div>
-        <div class="breakdown-row">
-          <span class="b-label">Already earned (this lvl)</span>
-          <span class="b-val">${earned.toLocaleString()}</span>
         </div>
       </div>
     </div>
