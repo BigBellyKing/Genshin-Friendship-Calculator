@@ -627,28 +627,24 @@
           </div>
         </div>
 
-        <div class="section-title" style="margin-top:8px">Progress Within Current Level (Pixel Method)</div>
-        <p class="pixel-note">Screenshot your in-game bar, then measure the total width and your filled width in pixels.</p>
-        
-        <div class="pixel-diagram-wrapper">
-          <svg class="pixel-diagram" viewBox="0 0 400 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="10" y="22" width="380" height="12" rx="6" fill="#1b2237" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <rect x="10" y="22" width="160" height="12" rx="6" fill="#7b8fc7" />
-            <path d="M 10 40 L 10 46 L 170 46 L 170 40" stroke="#7b8fc7" stroke-width="1" stroke-dasharray="2 2"/>
-            <text x="90" y="56" fill="#8ea1db" font-size="9" text-anchor="middle" font-family="'Lato', sans-serif" font-weight="bold" letter-spacing="0.05em">CURRENT FILL (PX)</text>
-            <path d="M 10 16 L 10 10 L 390 10 L 390 16" stroke="#d3bc8e" stroke-width="1" stroke-dasharray="2 2"/>
-            <text x="200" y="5" fill="#d3bc8e" font-size="9" text-anchor="middle" font-family="'Lato', sans-serif" font-weight="bold" letter-spacing="0.05em">FULL BAR WIDTH (PX)</text>
-          </svg>
-        </div>
-
-        <div class="bar-inputs">
-          <div class="field">
-            <label>Full bar width (px)</label>
-            <input type="number" id="fullBar" value="276" min="1" placeholder="e.g. 300">
-          </div>
-          <div class="field">
-            <label>Current fill (px)</label>
-            <input type="number" id="curFill" value="0" min="0" placeholder="e.g. 75">
+        <!-- Replace with: -->
+        <div class="section-title" style="margin-top:8px">Progress Within Current Level</div>
+        <div class="field" style="margin-bottom: 1rem;">
+          <label id="curExpLabel">Current EXP (0 - 999)</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="number" id="curExp" value="0" min="0" max="999" placeholder="Enter current EXP">
+            <button type="button" id="resetExpBtn" style="
+              background: var(--bg-input);
+              border: 1px solid var(--color-border-tertiary);
+              color: var(--color-text-secondary);
+              border-radius: var(--border-radius-md);
+              padding: 0 12px;
+              font-size: 11px;
+              cursor: pointer;
+              white-space: nowrap;
+              text-transform: uppercase;
+              font-family: 'Lato', sans-serif;
+            ">Reset to 0</button>
           </div>
         </div>
 
@@ -698,8 +694,7 @@ const ACTIVITIES = [
 const state = {
   curLevel: 1,
   targetLevel: 10,
-  fullBar: 300,
-  curFill: 0,
+  curExp: 0, // Direct numeric EXP
   activities: {},
   coopMode: {},
   uses: {} 
@@ -818,12 +813,36 @@ function getExpData() {
 }
 
 function getAlreadyEarned() {
-  const fullBar = state.fullBar || 1;
-  const curFill = Math.min(state.curFill, fullBar);
-  const ratio = curFill / fullBar;
-  const lvlExp = EXP_TABLE[state.curLevel] || 0;
-  return Math.round(ratio * lvlExp);
+  const maxExpForCurLevel = EXP_TABLE[state.curLevel] || 0;
+  // Clamp value to prevent invalid math if user types an overflow number
+  return Math.max(0, Math.min(state.curExp, maxExpForCurLevel));
 }
+
+function updateExpInputConstraints() {
+  const maxAllowed = (EXP_TABLE[state.curLevel] || 1) - 1;
+  const expInput = document.getElementById('curExp');
+  const expLabel = document.getElementById('curExpLabel');
+  
+  expInput.max = maxAllowed;
+  expInput.placeholder = `0 - ${maxAllowed.toLocaleString()}`;
+  expLabel.textContent = `Current EXP (0 - ${maxAllowed.toLocaleString()})`;
+  
+  if (state.curExp > maxAllowed) {
+    state.curExp = maxAllowed;
+    expInput.value = maxAllowed;
+  }
+}
+
+document.getElementById('curExp').addEventListener('input', e => {
+  state.curExp = parseInt(e.target.value, 10) || 0;
+  calculate();
+});
+
+document.getElementById('resetExpBtn').addEventListener('click', () => {
+  state.curExp = 0;
+  document.getElementById('curExp').value = 0;
+  calculate();
+});
 
 function calculate() {
   const result = document.getElementById('resultArea');
