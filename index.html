@@ -137,7 +137,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
   }
 
   .friendship-calc-container .field label {
@@ -181,39 +181,37 @@
     box-shadow: 0 0 0 3px rgba(211, 188, 142, 0.15);
   }
 
-  /* Pixel Method Visual Helper */
-  .friendship-calc-container .bar-inputs {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 1rem;
+  /* Direct EXP Input Row */
+  .friendship-calc-container .exp-input-group {
+    display: flex;
+    gap: 8px;
   }
 
-  .friendship-calc-container .pixel-note {
-    font-size: 11px;
+  .friendship-calc-container .reset-btn {
+    background: var(--bg-input);
+    border: 1px solid var(--color-border-tertiary);
     color: var(--color-text-secondary);
-    line-height: 1.4;
-    font-style: italic;
-    margin-bottom: 12px;
-  }
-
-  .friendship-calc-container .pixel-diagram-wrapper {
-    background: rgba(0, 0, 0, 0.15);
     border-radius: var(--border-radius-md);
-    padding: 8px 12px;
-    border: 1px dashed var(--color-border-primary);
-    margin-bottom: 1rem;
+    padding: 0 14px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
   }
 
-  .friendship-calc-container .pixel-diagram {
-    width: 100%;
-    height: auto;
-    display: block;
+  .friendship-calc-container .reset-btn:hover {
+    color: var(--color-accent);
+    border-color: var(--color-border-primary);
+    background: rgba(211, 188, 142, 0.05);
   }
 
   /* Progress Bar styling */
   .friendship-calc-container .progress-visual {
-    background: rgba(0,0,0,0.2);
+    background: rgba(0, 0, 0, 0.2);
     border-radius: var(--border-radius-md);
     padding: 12px;
     border: 1px solid var(--color-border-tertiary);
@@ -358,7 +356,7 @@
     box-shadow: 0 2px 8px rgba(123, 143, 199, 0.3);
   }
 
-  /* Resin stepper */
+  /* Stepper */
   .friendship-calc-container .resin-count-row {
     display: flex;
     align-items: center;
@@ -432,7 +430,7 @@
     background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
   }
 
-  /* Today's Forecast Box (The Tactical View) */
+  /* Today's Forecast Box */
   .friendship-calc-container .today-forecast-box {
     margin-bottom: 1.5rem;
     padding: 1.25rem;
@@ -473,7 +471,7 @@
     letter-spacing: 0.05em;
   }
 
-  /* Estimated Target Date Box (Long term) */
+  /* Estimated Target Date Box */
   .friendship-calc-container .target-date-box {
     text-align: center;
     margin-bottom: 1.5rem;
@@ -597,7 +595,7 @@
 
         <div class="level-select-row">
           <div class="field">
-            <label>Current Level</label>
+            <label for="curLevel">Current Level</label>
             <select id="curLevel">
               <option value="1">Level 1</option>
               <option value="2">Level 2</option>
@@ -612,7 +610,7 @@
             </select>
           </div>
           <div class="field">
-            <label>Target Level</label>
+            <label for="targetLevel">Target Level</label>
             <select id="targetLevel">
               <option value="2">Level 2</option>
               <option value="3">Level 3</option>
@@ -627,24 +625,12 @@
           </div>
         </div>
 
-        <!-- Replace with: -->
-        <div class="section-title" style="margin-top:8px">Progress Within Current Level</div>
+        <div class="section-title" style="margin-top: 8px;">Progress Within Current Level</div>
         <div class="field" style="margin-bottom: 1rem;">
-          <label id="curExpLabel">Current EXP (0 - 999)</label>
-          <div style="display: flex; gap: 8px;">
+          <label id="curExpLabel" for="curExp">Current EXP (0 - 999)</label>
+          <div class="exp-input-group">
             <input type="number" id="curExp" value="0" min="0" max="999" placeholder="Enter current EXP">
-            <button type="button" id="resetExpBtn" style="
-              background: var(--bg-input);
-              border: 1px solid var(--color-border-tertiary);
-              color: var(--color-text-secondary);
-              border-radius: var(--border-radius-md);
-              padding: 0 12px;
-              font-size: 11px;
-              cursor: pointer;
-              white-space: nowrap;
-              text-transform: uppercase;
-              font-family: 'Lato', sans-serif;
-            ">Reset to 0</button>
+            <button type="button" id="resetExpBtn" class="reset-btn">Reset to 0</button>
           </div>
         </div>
 
@@ -662,7 +648,6 @@
       <!-- Card 2: Today's Tasks -->
       <div class="card">
         <div class="section-title">Today's Activities Configuration</div>
-        <p class="pixel-note" style="margin-bottom:12px;">Toggle tasks to see exactly where you will end up tonight. Averages are used for long-term estimates.</p>
         <div class="activities-grid" id="activitiesGrid"></div>
       </div>
     </div>
@@ -677,7 +662,7 @@
 <script>
 const EXP_TABLE = { 1:1000, 2:1550, 3:2050, 4:2600, 5:3175, 6:3750, 7:4350, 8:4975, 9:5650 };
 
-// Values assumed for High/Max Adventure Rank
+// Base values assumed for High/Max Adventure Rank
 const ACTIVITIES = [
   { id:'commission', name:'Commissions', baseExp:60, coopExp:120, desc:'×4/day', hasCoop:true, defaultOn:true },
   { id:'dailyReward', name:'Daily reward', baseExp:100, coopExp:200, desc:'Katheryne bonus', hasCoop:true, defaultOn:true },
@@ -694,7 +679,7 @@ const ACTIVITIES = [
 const state = {
   curLevel: 1,
   targetLevel: 10,
-  curExp: 0, // Direct numeric EXP
+  curExp: 0,
   activities: {},
   coopMode: {},
   uses: {} 
@@ -757,11 +742,12 @@ function buildActivities() {
     };
 
     item.querySelector(`[data-chk-id="${a.id}"]`).addEventListener('click', (e) => {
-      e.stopPropagation(); triggerToggle();
+      e.stopPropagation(); 
+      triggerToggle();
     });
 
     item.querySelector(`[data-toggle="${a.id}"]`).addEventListener('click', (e) => {
-      if(e.target.closest('.number-stepper') || e.target.closest('.step-btn')) return;
+      if (e.target.closest('.number-stepper') || e.target.closest('.step-btn')) return;
       triggerToggle();
     });
 
@@ -770,18 +756,23 @@ function buildActivities() {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         state.coopMode[a.id] = btn.dataset.mode === 'coop';
-        buildActivities(); calculate();
+        buildActivities(); 
+        calculate();
       });
     });
 
     if (a.isCountable) {
       item.querySelector('.step-btn.minus').addEventListener('click', (e) => {
-        e.stopPropagation(); state.uses[a.id] = Math.max(0, state.uses[a.id] - 1);
-        buildActivities(); calculate();
+        e.stopPropagation(); 
+        state.uses[a.id] = Math.max(0, state.uses[a.id] - 1);
+        buildActivities(); 
+        calculate();
       });
       item.querySelector('.step-btn.plus').addEventListener('click', (e) => {
-        e.stopPropagation(); state.uses[a.id] = Math.min(99, state.uses[a.id] + 1);
-        buildActivities(); calculate();
+        e.stopPropagation(); 
+        state.uses[a.id] = Math.min(99, state.uses[a.id] + 1);
+        buildActivities(); 
+        calculate();
       });
     }
   });
@@ -789,7 +780,7 @@ function buildActivities() {
 
 function getExpData() {
   let todayTotal = 0;   // Tactical: exactly what is checked right now
-  let avgDaily = 0;     // Strategic: Weekly tasks are divided by 7 for long term estimates
+  let avgDaily = 0;     // Strategic: Weekly tasks divided by 7 for schedule projection
 
   ACTIVITIES.forEach(a => {
     if (!state.activities[a.id]) return;
@@ -813,36 +804,32 @@ function getExpData() {
 }
 
 function getAlreadyEarned() {
-  const maxExpForCurLevel = EXP_TABLE[state.curLevel] || 0;
-  // Clamp value to prevent invalid math if user types an overflow number
-  return Math.max(0, Math.min(state.curExp, maxExpForCurLevel));
+  const maxAllowed = EXP_TABLE[state.curLevel] || 0;
+  return Math.max(0, Math.min(state.curExp, maxAllowed));
 }
 
-function updateExpInputConstraints() {
-  const maxAllowed = (EXP_TABLE[state.curLevel] || 1) - 1;
+function updateExpConstraints() {
   const expInput = document.getElementById('curExp');
   const expLabel = document.getElementById('curExpLabel');
   
+  if (state.curLevel >= 10) {
+    expInput.disabled = true;
+    expInput.value = 0;
+    expLabel.textContent = 'Maximum Level Reached';
+    return;
+  }
+
+  expInput.disabled = false;
+  const maxAllowed = (EXP_TABLE[state.curLevel] || 1) - 1;
   expInput.max = maxAllowed;
   expInput.placeholder = `0 - ${maxAllowed.toLocaleString()}`;
   expLabel.textContent = `Current EXP (0 - ${maxAllowed.toLocaleString()})`;
-  
+
   if (state.curExp > maxAllowed) {
     state.curExp = maxAllowed;
     expInput.value = maxAllowed;
   }
 }
-
-document.getElementById('curExp').addEventListener('input', e => {
-  state.curExp = parseInt(e.target.value, 10) || 0;
-  calculate();
-});
-
-document.getElementById('resetExpBtn').addEventListener('click', () => {
-  state.curExp = 0;
-  document.getElementById('curExp').value = 0;
-  calculate();
-});
 
 function calculate() {
   const result = document.getElementById('resultArea');
@@ -851,7 +838,7 @@ function calculate() {
   if (state.curLevel >= state.targetLevel) {
     result.innerHTML = `
       <div class="result-card">
-        <div class="max-level">✦ Already reached target level!</div>
+        <div class="max-level">✦ Target level already reached!</div>
       </div>`;
     vis.style.display = 'none';
     return;
@@ -861,15 +848,14 @@ function calculate() {
   const earned = getAlreadyEarned();
   const pct = lvlExp > 0 ? Math.round((earned / lvlExp) * 100) : 0;
 
-  // Update Visual Progress Bar
+  // Visual bar update
   vis.style.display = 'block';
   document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressExp').textContent = earned.toLocaleString() + ' / ' + lvlExp.toLocaleString() + ' EXP';
+  document.getElementById('progressExp').textContent = `${earned.toLocaleString()} / ${lvlExp.toLocaleString()} EXP`;
   document.getElementById('progressFill').style.width = pct + '%';
 
-  // Fetch math streams
+  // Math totals
   const exps = getExpData();
-  const totalNeeded = 0;
   let accumulated = 0;
   for (let lvl = state.curLevel; lvl < state.targetLevel; lvl++) {
     if (EXP_TABLE[lvl]) accumulated += EXP_TABLE[lvl];
@@ -877,7 +863,7 @@ function calculate() {
   const remaining = Math.max(0, accumulated - earned);
   const days = exps.avgDaily > 0 ? Math.ceil(remaining / exps.avgDaily) : Infinity;
 
-  // Simulate End of Day Progress
+  // End of Day Progress Simulation
   let simEarned = earned + exps.todayTotal;
   let simLevel = state.curLevel;
   let leveledUpText = '';
@@ -895,7 +881,7 @@ function calculate() {
     simPct = 100;
   }
 
-  // Formatting strings
+  // Schedule formatting
   let targetDateText = "Select activities";
   if (days !== Infinity && exps.avgDaily > 0) {
     const today = new Date();
@@ -907,15 +893,12 @@ function calculate() {
 
   result.innerHTML = `
     <div class="result-card">
-      
-      <!-- TACTICAL VIEW: What happens today -->
       <div class="today-forecast-box">
         <div class="forecast-label">Tonight's Projection</div>
         <div class="forecast-value">Lv. ${simLevel} <span class="f-pct">(${simPct}%)</span></div>
         <div class="forecast-sub">+${exps.todayTotal.toLocaleString()} EXP today${leveledUpText}</div>
       </div>
 
-      <!-- STRATEGIC VIEW: Long term schedule -->
       <div class="target-date-box">
         <p>Estimated Completion Date</p>
         <h3>${targetDateText}</h3>
@@ -942,31 +925,42 @@ function calculate() {
   `;
 }
 
+// Event Listeners
 document.getElementById('curLevel').addEventListener('change', e => {
-  state.curLevel = parseInt(e.target.value);
+  state.curLevel = parseInt(e.target.value, 10);
   const targetSel = document.getElementById('targetLevel');
+  
   Array.from(targetSel.options).forEach(opt => {
-    opt.disabled = parseInt(opt.value) <= state.curLevel;
+    opt.disabled = parseInt(opt.value, 10) <= state.curLevel;
   });
+  
   if (state.targetLevel <= state.curLevel) {
-    state.targetLevel = state.curLevel + 1;
+    state.targetLevel = Math.min(10, state.curLevel + 1);
     targetSel.value = state.targetLevel;
   }
+  
+  updateExpConstraints();
   calculate();
 });
 
 document.getElementById('targetLevel').addEventListener('change', e => {
-  state.targetLevel = parseInt(e.target.value);
+  state.targetLevel = parseInt(e.target.value, 10);
   calculate();
 });
 
-['fullBar','curFill'].forEach(id => {
-  document.getElementById(id).addEventListener('input', e => {
-    state[id] = parseFloat(e.target.value) || 0;
-    calculate();
-  });
+document.getElementById('curExp').addEventListener('input', e => {
+  state.curExp = parseInt(e.target.value, 10) || 0;
+  calculate();
 });
 
+document.getElementById('resetExpBtn').addEventListener('click', () => {
+  state.curExp = 0;
+  document.getElementById('curExp').value = 0;
+  calculate();
+});
+
+// Initial boot
+updateExpConstraints();
 buildActivities();
 calculate();
 </script>
